@@ -178,7 +178,19 @@ AC_CHECK_FUNCS([rl_set_prompt])
 
 AX_PTHREAD
 
-AX_CHECK_OPENSSL([AC_DEFINE_UNQUOTED([HAVE_OPENSSL],[1],[Set if OpenSSL is present])])
+AX_CHECK_OPENSSL([
+	tmp_LIBS="${LIBS}"
+	LIBS="${OPENSSL_LIBS}"
+
+	AC_CHECK_FUNC([DTLSv1_2_method], [
+		AC_DEFINE_UNQUOTED([HAVE_OPENSSL],[1],[Set if OpenSSL is present])
+		if test "${SMCP_DTLS+set}" != "set"
+		then SMCP_DTLS=1
+		fi
+	])
+
+	LIBS="${tmp_LIBS}"
+])
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -227,6 +239,9 @@ dnl ])
 
 if test "${SMCP_EMBEDDED+set}" = "set"
 then AC_DEFINE_UNQUOTED([SMCP_EMBEDDED], [$SMCP_EMBEDDED], [.])
+fi
+if test "${SMCP_DTLS+set}" = "set"
+then AC_DEFINE_UNQUOTED([SMCP_DTLS], [$SMCP_DTLS], [.])
 fi
 if test "${SMCP_USE_BSD_SOCKETS+set}" = "set"
 then AC_DEFINE_UNQUOTED([SMCP_USE_BSD_SOCKETS], [$SMCP_USE_BSD_SOCKETS], [.])

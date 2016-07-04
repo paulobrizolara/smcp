@@ -3,7 +3,7 @@
 #include <config.h>
 #endif
 
-#include <smcp/assert-macros.h>
+#include "smcp/assert-macros.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -602,6 +602,7 @@ main(
 ) {
 	int i, debug_mode = 0;
 	uint16_t port = 61616;
+	uint16_t ssl_port = 61617;
 
 	srandom(time(NULL));
 
@@ -675,6 +676,20 @@ main(
 			return ERRORCODE_INIT_FAILURE;
 		}
 	}
+
+#if SMCP_DTLS
+	void* ssl_ctx = NULL;
+	if (smcp_plat_ssl_set_context(gSMCPInstance, ssl_ctx) == SMCP_STATUS_OK) {
+
+		if (smcp_plat_bind_to_port(gSMCPInstance, SMCP_SESSION_TYPE_DTLS, ssl_port) != SMCP_STATUS_OK) {
+			if(smcp_plat_bind_to_port(gSMCPInstance, SMCP_SESSION_TYPE_DTLS, 0) != SMCP_STATUS_OK) {
+				fprintf(stderr,"%s: ERROR: Unable to bind to ssl port! \"%s\" (%d)\n",argv[0],strerror(errno),errno);
+			}
+		}
+	} else {
+		fprintf(stderr,"%s: ERROR: Unable to set ssl context!\n",argv[0]);
+	}
+#endif
 
 	setenv("SMCP_CURRENT_PATH", "coap://localhost/", 0);
 

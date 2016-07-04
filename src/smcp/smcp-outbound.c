@@ -418,7 +418,6 @@ smcp_outbound_set_uri(
 	SMCP_NON_RECURSIVE char* uri_copy;
 
 	memset((void*)&components, 0, sizeof(components));
-	toport = COAP_DEFAULT_PORT;
 	smcp_plat_set_session_type(SMCP_SESSION_TYPE_UDP);
 	uri_copy = NULL;
 
